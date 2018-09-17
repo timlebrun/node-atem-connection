@@ -29,10 +29,10 @@ export declare class AtemSocket extends EventEmitter {
     log(..._args: any[]): void;
     readonly nextPacketId: number;
     _sendCommand(command: AbstractCommand): void;
-    private _createSocket();
-    private _receivePacket(packet, rinfo);
-    private _parseCommand(buffer, packetId?);
-    private _sendPacket(packet);
-    private _sendAck(packetId);
-    private _checkForRetransmit();
+    private _createSocket;
+    private _receivePacket;
+    private _parseCommand;
+    private _sendPacket;
+    private _sendAck;
+    private _checkForRetransmit;
 }

@@ -74,6 +74,6 @@ export declare class Atem extends EventEmitter {
     uploadStill(index: number, data: Buffer, name: string, description: string): Promise<{}>;
     uploadClip(index: number, frames: Array<Buffer>, name: string): Promise<{}>;
     uploadAudio(index: number, data: Buffer, name: string): Promise<{}>;
-    private _mutateState(command);
-    private _resolveCommand(packetId);
+    private _mutateState;
+    private _resolveCommand;
 }

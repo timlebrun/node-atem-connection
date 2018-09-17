@@ -49,7 +49,7 @@ class DataLock {
         if (this.queue.length > 0) {
             this.dequeueAndRun();
         }
-        else {
+        else { // unlock
             const command = new __1.Commands.LockStateCommand();
             command.updateProps({
                 index: this.storeId,
