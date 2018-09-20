@@ -69,7 +69,9 @@ export interface IMixEffect {
     numberOfKeyers: number;
     transitionProperties: TransitionProperties;
     transitionSettings: TransitionSettings;
-    upstreamKeyers: Array<USK.UpstreamKeyer>;
+    upstreamKeyers: {
+        [index: number]: USK.UpstreamKeyer;
+    };
 }
 export declare class MixEffect implements IMixEffect {
     index: number;
@@ -83,7 +85,9 @@ export declare class MixEffect implements IMixEffect {
     numberOfKeyers: number;
     transitionProperties: TransitionProperties;
     transitionSettings: TransitionSettings;
-    upstreamKeyers: Array<USK.UpstreamKeyer>;
+    upstreamKeyers: {
+        [index: number]: USK.UpstreamKeyer;
+    };
     constructor(index: number);
     getUpstreamKeyer(index: number): USK.UpstreamKeyer;
 }
@@ -99,11 +103,42 @@ export interface SuperSourceBox {
     cropLeft: number;
     cropRight: number;
 }
+export interface SuperSourceProperties {
+    artFillSource: number;
+    artCutSource: number;
+    artOption: Enum.SuperSourceArtOption;
+    artPreMultiplied: boolean;
+    artClip: number;
+    artGain: number;
+    artInvertKey: boolean;
+    borderEnabled: boolean;
+    borderBevel: Enum.BorderBevel;
+    borderOuterWidth: number;
+    borderInnerWidth: number;
+    borderOuterSoftness: number;
+    borderInnerSoftness: number;
+    borderBevelSoftness: number;
+    borderBevelPosition: number;
+    borderHue: number;
+    borderSaturation: number;
+    borderLuma: number;
+    borderLightSourceDirection: number;
+    borderLightSourceAltitude: number;
+}
 export declare class AtemVideoState {
-    ME: Array<MixEffect>;
-    downstreamKeyers: Array<DownstreamKeyer>;
-    auxilliaries: Array<number>;
-    superSourceBoxes: Array<SuperSourceBox>;
+    ME: {
+        [index: string]: MixEffect;
+    };
+    downstreamKeyers: {
+        [index: string]: DownstreamKeyer;
+    };
+    auxilliaries: {
+        [index: string]: number;
+    };
+    superSourceBoxes: {
+        [index: string]: SuperSourceBox;
+    };
+    superSourceProperties: SuperSourceProperties;
     getMe(index: number): MixEffect;
     getDownstreamKeyer(index: number): DownstreamKeyer;
 }

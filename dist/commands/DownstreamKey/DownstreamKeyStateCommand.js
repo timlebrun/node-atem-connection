@@ -1,13 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../AbstractCommand");
+const __1 = require("../..");
 class DownstreamKeyStateCommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
         this.rawName = 'DskS';
     }
     deserialize(rawCommand) {
-        this.downstreamKeyId = rawCommand[0];
+        this.downstreamKeyId = __1.Util.parseNumberBetween(rawCommand[0], 0, 3);
         this.properties = {
             onAir: rawCommand[1] === 1,
             inTransition: rawCommand[2] === 1,

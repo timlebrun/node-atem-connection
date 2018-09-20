@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../../AbstractCommand");
+const __1 = require("../../..");
 class TransitionStingerCommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
@@ -10,12 +11,12 @@ class TransitionStingerCommand extends AbstractCommand_1.default {
         this._updateProps(newProps);
     }
     deserialize(rawCommand) {
-        this.mixEffect = rawCommand[0];
+        this.mixEffect = __1.Util.parseNumberBetween(rawCommand[0], 0, 3);
         this.properties = {
             source: rawCommand[1],
             preMultipliedKey: rawCommand[2] === 1,
-            clip: rawCommand[4] << 8 | rawCommand[5],
-            gain: rawCommand[6] << 8 | rawCommand[7],
+            clip: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(4), 0, 1000),
+            gain: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(6), 0, 1000),
             invert: rawCommand[8] === 1,
             preroll: rawCommand[10] << 8 | rawCommand[11],
             clipDuration: rawCommand[12] << 8 | rawCommand[13],

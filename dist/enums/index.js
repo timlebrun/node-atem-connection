@@ -178,12 +178,26 @@ var MixEffectKeyType;
     MixEffectKeyType[MixEffectKeyType["Pattern"] = 2] = "Pattern";
     MixEffectKeyType[MixEffectKeyType["DVE"] = 3] = "DVE";
 })(MixEffectKeyType = exports.MixEffectKeyType || (exports.MixEffectKeyType = {}));
+var SuperSourceArtOption;
+(function (SuperSourceArtOption) {
+    SuperSourceArtOption[SuperSourceArtOption["Background"] = 0] = "Background";
+    SuperSourceArtOption[SuperSourceArtOption["Foreground"] = 1] = "Foreground";
+})(SuperSourceArtOption = exports.SuperSourceArtOption || (exports.SuperSourceArtOption = {}));
+var IPCMessageType;
+(function (IPCMessageType) {
+    IPCMessageType["Log"] = "log";
+    IPCMessageType["Connect"] = "connect";
+    IPCMessageType["Disconnect"] = "disconnect";
+    IPCMessageType["InboundCommand"] = "inboundCommand";
+    IPCMessageType["OutboundCommand"] = "outboundCommand";
+    IPCMessageType["CommandAcknowledged"] = "commandAcknowledged";
+})(IPCMessageType = exports.IPCMessageType || (exports.IPCMessageType = {}));
 var TransferMode;
 (function (TransferMode) {
     TransferMode[TransferMode["NoOp"] = 0] = "NoOp";
     TransferMode[TransferMode["Write"] = 1] = "Write";
     TransferMode[TransferMode["Clear"] = 2] = "Clear";
-    TransferMode[TransferMode["WriteAudio"] = 3] = "WriteAudio";
+    TransferMode[TransferMode["WriteAudio"] = 256] = "WriteAudio";
 })(TransferMode = exports.TransferMode || (exports.TransferMode = {}));
 var StoragePool;
 (function (StoragePool) {

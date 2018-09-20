@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import { AtemState } from './state';
 import AbstractCommand from './commands/AbstractCommand';
 import { MediaPlayer } from './state/media';
-import { DipTransitionSettings, DVETransitionSettings, MixTransitionSettings, StingerTransitionSettings, SuperSourceBox, TransitionProperties, WipeTransitionSettings } from './state/video';
+import { DipTransitionSettings, DVETransitionSettings, MixTransitionSettings, StingerTransitionSettings, SuperSourceBox, TransitionProperties, WipeTransitionSettings, SuperSourceProperties } from './state/video';
 import * as USK from './state/video/upstreamKeyers';
 import { InputChannel } from './state/input';
 import { DownstreamKeyerGeneral, DownstreamKeyerMask } from './state/video/downstreamKeyers';
@@ -26,7 +26,7 @@ export declare class Atem extends EventEmitter {
     private _log;
     private _sentQueue;
     constructor(options?: AtemOptions);
-    connect(address: string, port?: number): void;
+    connect(address: string, port?: number): Promise<{}>;
     disconnect(): Promise<void>;
     sendCommand(command: AbstractCommand): Promise<any>;
     changeProgramInput(input: number, me?: number): Promise<any>;
@@ -61,6 +61,7 @@ export declare class Atem extends EventEmitter {
     clearMediaPoolClip(clipId: number): Promise<any>;
     clearMediaPoolStill(stillId: number): Promise<any>;
     setSuperSourceBoxSettings(newProps: Partial<SuperSourceBox>, box?: number): Promise<any>;
+    setSuperSourceProperties(newProps: Partial<SuperSourceProperties>): Promise<any>;
     setInputSettings(newProps: Partial<InputChannel>, input?: number): Promise<any>;
     setUpstreamKeyerChromaSettings(newProps: Partial<USK.UpstreamKeyerChromaSettings>, me?: number, keyer?: number): Promise<any>;
     setUpstreamKeyerCutSource(cutSource: number, me?: number, keyer?: number): Promise<any>;

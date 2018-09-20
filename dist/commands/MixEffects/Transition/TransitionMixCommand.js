@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../../AbstractCommand");
+const __1 = require("../../..");
 class TransitionMixCommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
@@ -10,9 +11,9 @@ class TransitionMixCommand extends AbstractCommand_1.default {
         this._updateProps(newProps);
     }
     deserialize(rawCommand) {
-        this.mixEffect = rawCommand[0];
+        this.mixEffect = __1.Util.parseNumberBetween(rawCommand[0], 0, 3);
         this.properties = {
-            rate: rawCommand[1]
+            rate: __1.Util.parseNumberBetween(rawCommand[1], 1, 250)
         };
     }
     serialize() {

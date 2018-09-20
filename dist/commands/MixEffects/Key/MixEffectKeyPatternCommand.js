@@ -1,21 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../../AbstractCommand");
+const __1 = require("../../..");
 class MixEffectKeyPatternCommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
         this.rawName = 'KePt';
     }
     deserialize(rawCommand) {
-        this.mixEffect = rawCommand[0];
-        this.upstreamKeyerId = rawCommand[1];
+        this.mixEffect = __1.Util.parseNumberBetween(rawCommand[0], 0, 3);
+        this.upstreamKeyerId = __1.Util.parseNumberBetween(rawCommand[1], 0, 3);
         this.properties = {
-            style: rawCommand[2],
-            size: rawCommand.readUInt16BE(4),
-            symmetry: rawCommand.readUInt16BE(6),
-            softness: rawCommand.readUInt16BE(8),
-            positionX: rawCommand.readUInt16BE(10),
-            positionY: rawCommand.readUInt16BE(12),
+            style: __1.Util.parseEnum(rawCommand[2], __1.Enums.Pattern),
+            size: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(4), 0, 10000),
+            symmetry: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(6), 0, 10000),
+            softness: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(8), 0, 10000),
+            positionX: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(10), 0, 10000),
+            positionY: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(12), 0, 10000),
             invert: rawCommand[14] === 1
         };
     }

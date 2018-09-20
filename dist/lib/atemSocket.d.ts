@@ -2,21 +2,12 @@
 import { EventEmitter } from 'events';
 import AbstractCommand from '../commands/AbstractCommand';
 export declare class AtemSocket extends EventEmitter {
-    private _connectionState;
     private _debug;
-    private _reconnectTimer;
-    private _retransmitTimer;
     private _localPacketId;
-    private _maxPacketID;
-    private _sessionId;
     private _address;
     private _port;
-    private _socket;
-    private _reconnectInterval;
-    private _inFlightTimeout;
-    private _maxRetries;
-    private _lastReceivedAt;
-    private _inFlight;
+    private _shouldConnect;
+    private _socketProcess;
     private _commandParser;
     constructor(options: {
         address?: string;
@@ -24,15 +15,13 @@ export declare class AtemSocket extends EventEmitter {
         debug?: boolean;
         log?: (args1: any, args2?: any, args3?: any) => void;
     });
-    connect(address?: string, port?: number): void;
+    connect(address?: string, port?: number): Promise<{}>;
     disconnect(): Promise<{}>;
     log(..._args: any[]): void;
     readonly nextPacketId: number;
-    _sendCommand(command: AbstractCommand): void;
-    private _createSocket;
-    private _receivePacket;
+    _sendCommand(command: AbstractCommand, trackingId: number): Promise<{}>;
+    private _createSocketProcess;
+    private _sendSubprocessMessage;
+    private _receiveSubprocessMessage;
     private _parseCommand;
-    private _sendPacket;
-    private _sendAck;
-    private _checkForRetransmit;
 }

@@ -31,12 +31,13 @@ class Atem extends events_1.EventEmitter {
         });
         this.dataTransferManager = new DT.DataTransferManager((command) => this.sendCommand(command));
         this.socket.on('receivedStateChange', (command) => this._mutateState(command));
-        this.socket.on('commandAcknowleged', (packetId) => this._resolveCommand(packetId));
+        this.socket.on(enums_1.IPCMessageType.CommandAcknowledged, ({ trackingId }) => this._resolveCommand(trackingId));
+        this.socket.on('error', (e) => this.emit('error', e));
         this.socket.on('connect', () => this.emit('connected'));
         this.socket.on('disconnect', () => this.emit('disconnected'));
     }
     connect(address, port) {
-        this.socket.connect(address, port);
+        return this.socket.connect(address, port);
     }
     disconnect() {
         return new Promise((resolve, reject) => {
@@ -45,13 +46,12 @@ class Atem extends events_1.EventEmitter {
     }
     sendCommand(command) {
         const nextPacketId = this.socket.nextPacketId;
-        const promise = new Promise((resolve, reject) => {
+        this._sentQueue[nextPacketId] = command;
+        return new Promise((resolve, reject) => {
             command.resolve = resolve;
             command.reject = reject;
+            this.socket._sendCommand(command, nextPacketId).catch(reject);
         });
-        this._sentQueue[nextPacketId] = command;
-        this.socket._sendCommand(command);
-        return promise;
     }
     changeProgramInput(input, me = 0) {
         const command = new Commands.ProgramInputCommand();
@@ -215,6 +215,11 @@ class Atem extends events_1.EventEmitter {
         command.updateProps(newProps);
         return this.sendCommand(command);
     }
+    setSuperSourceProperties(newProps) {
+        const command = new Commands.SuperSourcePropertiesCommand();
+        command.updateProps(newProps);
+        return this.sendCommand(command);
+    }
     setInputSettings(newProps, input = 0) {
         const command = new Commands.InputPropertiesCommand();
         command.inputId = input;
@@ -297,7 +302,7 @@ class Atem extends events_1.EventEmitter {
         return this.dataTransferManager.uploadClip(index, data, name);
     }
     uploadAudio(index, data, name) {
-        return this.dataTransferManager.uploadAudio(index, data, name);
+        return this.dataTransferManager.uploadAudio(index, atemUtil_1.Util.convertWAVToRaw(data), name);
     }
     _mutateState(command) {
         if (typeof command.applyToState === 'function') {
@@ -310,10 +315,10 @@ class Atem extends events_1.EventEmitter {
             }
         }
     }
-    _resolveCommand(packetId) {
-        if (this._sentQueue[packetId]) {
-            this._sentQueue[packetId].resolve(this._sentQueue[packetId]);
-            delete this._sentQueue[packetId];
+    _resolveCommand(trackingId) {
+        if (this._sentQueue[trackingId]) {
+            this._sentQueue[trackingId].resolve(this._sentQueue[trackingId]);
+            delete this._sentQueue[trackingId];
         }
     }
 }

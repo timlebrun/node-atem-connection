@@ -1,19 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../../AbstractCommand");
+const __1 = require("../../..");
 class MixEffectKeyChromaCommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
         this.rawName = 'KeCk';
     }
     deserialize(rawCommand) {
-        this.mixEffect = rawCommand[0];
-        this.upstreamKeyerId = rawCommand[1];
+        this.mixEffect = __1.Util.parseNumberBetween(rawCommand[0], 0, 3);
+        this.upstreamKeyerId = __1.Util.parseNumberBetween(rawCommand[1], 0, 3);
         this.properties = {
-            hue: rawCommand.readUInt16BE(2),
-            gain: rawCommand.readUInt16BE(4),
-            ySuppress: rawCommand.readUInt16BE(6),
-            lift: rawCommand.readUInt16BE(8),
+            hue: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(2), 0, 3599),
+            gain: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(4), 0, 1000),
+            ySuppress: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(6), 0, 1000),
+            lift: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(8), 0, 1000),
             narrow: rawCommand[10] === 1
         };
     }

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../AbstractCommand");
+const atemUtil_1 = require("../../lib/atemUtil");
 class MediaPlayerStatusCommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
@@ -10,7 +11,7 @@ class MediaPlayerStatusCommand extends AbstractCommand_1.default {
         this._updateProps(newProps);
     }
     deserialize(rawCommand) {
-        this.mediaPlayerId = rawCommand[0];
+        this.mediaPlayerId = atemUtil_1.Util.parseNumberBetween(rawCommand[0], 0, 3);
         this.properties = {
             playing: rawCommand[1] === 1,
             loop: rawCommand[2] === 1,

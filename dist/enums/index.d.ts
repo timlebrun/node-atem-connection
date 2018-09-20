@@ -160,11 +160,23 @@ export declare enum MixEffectKeyType {
     Pattern = 2,
     DVE = 3
 }
+export declare enum SuperSourceArtOption {
+    Background = 0,
+    Foreground = 1
+}
+export declare enum IPCMessageType {
+    Log = "log",
+    Connect = "connect",
+    Disconnect = "disconnect",
+    InboundCommand = "inboundCommand",
+    OutboundCommand = "outboundCommand",
+    CommandAcknowledged = "commandAcknowledged"
+}
 export declare enum TransferMode {
     NoOp = 0,
     Write = 1,
     Clear = 2,
-    WriteAudio = 3
+    WriteAudio = 256
 }
 export declare enum StoragePool {
     Stills = 0,

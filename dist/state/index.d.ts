@@ -3,6 +3,7 @@ import { AtemVideoState } from './video';
 import { AtemAudioState } from './audio';
 import { MediaState } from './media';
 import { InputChannel } from './input';
+import { MacroPlayerState } from './macroPlayer';
 export declare class AtemState {
     info: DeviceInfo;
     settings: {
@@ -17,4 +18,5 @@ export declare class AtemState {
     audio: AtemAudioState;
     media: MediaState;
     inputs: Array<InputChannel>;
+    macroPlayer: MacroPlayerState;
 }

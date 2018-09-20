@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../../AbstractCommand");
+const __1 = require("../../..");
 class TransitionDVECommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
@@ -10,17 +11,17 @@ class TransitionDVECommand extends AbstractCommand_1.default {
         this._updateProps(newProps);
     }
     deserialize(rawCommand) {
-        this.mixEffect = rawCommand[0];
+        this.mixEffect = __1.Util.parseNumberBetween(rawCommand[0], 0, 3);
         this.properties = {
-            rate: rawCommand[1],
-            logoRate: rawCommand[2],
-            style: rawCommand[3],
+            rate: __1.Util.parseNumberBetween(rawCommand[1], 1, 250),
+            logoRate: __1.Util.parseNumberBetween(rawCommand[2], 1, 250),
+            style: __1.Util.parseEnum(rawCommand[3], __1.Enums.DVEEffect),
             fillSource: rawCommand[4] << 8 | (rawCommand[5] & 0xff),
             keySource: rawCommand[6] << 8 | (rawCommand[7] & 0xff),
             enableKey: rawCommand[8] === 1,
             preMultiplied: rawCommand[9] === 1,
-            clip: rawCommand[10] << 8 | (rawCommand[11] & 0xff),
-            gain: rawCommand[12] << 8 | (rawCommand[13] & 0xff),
+            clip: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(10), 0, 1000),
+            gain: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(12), 0, 1000),
             invertKey: rawCommand[14] === 1,
             reverse: rawCommand[15] === 1,
             flipFlop: rawCommand[16] === 1

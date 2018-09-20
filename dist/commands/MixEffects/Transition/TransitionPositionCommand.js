@@ -1,17 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../../AbstractCommand");
+const __1 = require("../../..");
 class TransitionPositionCommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
         this.rawName = 'TrPs'; // this seems unnecessary.
     }
     deserialize(rawCommand) {
-        this.mixEffect = rawCommand[0];
+        this.mixEffect = __1.Util.parseNumberBetween(rawCommand[0], 0, 3);
         this.properties = {
             inTransition: rawCommand[1] === 1,
-            remainingFrames: rawCommand[2],
-            handlePosition: rawCommand[4] << 8 | rawCommand[4]
+            remainingFrames: __1.Util.parseNumberBetween(rawCommand[2], 0, 250),
+            handlePosition: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(4), 0, 10000)
         };
     }
     serialize() {

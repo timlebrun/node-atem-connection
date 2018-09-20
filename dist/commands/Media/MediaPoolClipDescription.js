@@ -18,10 +18,10 @@ class MediaPoolClipDescriptionCommand extends AbstractCommand_1.default {
     }
     applyToState(state) {
         const newProps = Object.assign({}, this.properties);
-        if (state.media.clipPool[this.mediaPool - 1]) {
-            newProps.frames = state.media.clipPool[this.mediaPool - 1].frames;
+        if (state.media.clipPool[this.mediaPool]) {
+            newProps.frames = state.media.clipPool[this.mediaPool].frames;
         }
-        state.media.clipPool[this.mediaPool - 1] = newProps;
+        state.media.clipPool[this.mediaPool] = newProps;
     }
 }
 exports.MediaPoolClipDescriptionCommand = MediaPoolClipDescriptionCommand;

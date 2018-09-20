@@ -6,7 +6,7 @@ export default abstract class DataTransfer {
     storeId: number;
     commandQueue: Array<Commands.AbstractCommand>;
     finish: (transfer: DataTransfer) => void;
-    fail: (errorCode?: number) => void;
+    fail: (error: Error) => void;
     abstract start(): void;
     abstract handleCommand(command: Commands.AbstractCommand): void;
     abstract gotLock(): void;

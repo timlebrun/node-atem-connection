@@ -14,8 +14,6 @@ class DataTransferManager {
         this.stillsLock = new dataLock_1.default(0, this.commandQueue);
         this.clip1Lock = new dataLock_1.default(1, this.commandQueue);
         this.clip2Lock = new dataLock_1.default(2, this.commandQueue);
-        this.audio1Lock = new dataLock_1.default(2, this.commandQueue);
-        this.audio2Lock = new dataLock_1.default(2, this.commandQueue);
         this.transferIndex = 0;
         setInterval(() => {
             if (this.commandQueue.length <= 0) {
@@ -28,8 +26,9 @@ class DataTransferManager {
         }, 0);
     }
     handleCommand(command) {
+        const allLocks = [this.stillsLock, this.clip1Lock, this.clip2Lock];
         // try to establish the associated DataLock:
-        let lock = this.stillsLock; // assign, because we get a false "used before asssigned error"
+        let lock = this.stillsLock; // assign, because we get a false "used before assigned error"
         if (command.constructor.name === __1.Commands.LockObtainedCommand.name || command.constructor.name === __1.Commands.LockStateCommand.name) {
             switch (command.properties.index) {
                 case 0:
@@ -41,19 +40,13 @@ class DataTransferManager {
                 case 2:
                     lock = this.clip2Lock;
                     break;
-                case 3:
-                    lock = this.audio1Lock;
-                    break;
-                case 4:
-                    lock = this.audio2Lock;
-                    break;
             }
         }
         else if (command.properties.storeId) {
-            lock = [this.stillsLock, this.clip1Lock, this.clip2Lock][command.properties.storeId];
+            lock = allLocks[command.properties.storeId];
         }
         else if (command.properties.transferId !== undefined || command.properties.transferIndex !== undefined) {
-            for (const _lock of [this.stillsLock, this.clip1Lock, this.clip2Lock]) {
+            for (const _lock of allLocks) {
                 if (_lock.transfer && (_lock.transfer.transferId === command.properties.transferId || _lock.transfer.transferId === command.properties.transferIndex)) {
                     lock = _lock;
                 }
@@ -61,7 +54,7 @@ class DataTransferManager {
         }
         else {
             // debugging:
-            console.log(command);
+            console.log('UNKNOWN COMMAND:', command);
             return;
         }
         // handle actual command
@@ -108,6 +101,7 @@ class DataTransferManager {
         });
         transfer.commandQueue = this.commandQueue;
         transfer.storeId = 1 + index;
+        transfer.clipIndex = index;
         transfer.description = { name };
         for (const frameId in data) {
             const frame = data[frameId];
@@ -131,10 +125,11 @@ class DataTransferManager {
         });
         transfer.commandQueue = this.commandQueue;
         transfer.transferId = this.transferIndex++;
-        transfer.storeId = 3 + index;
+        transfer.storeId = 1 + index;
         transfer.description = { name };
         transfer.data = data;
-        [this.audio1Lock, this.audio2Lock][index].enqueue(transfer);
+        transfer.hash = crypto.createHash('md5').update(data).digest().toString();
+        [this.clip1Lock, this.clip2Lock][index].enqueue(transfer);
         return ps;
     }
 }

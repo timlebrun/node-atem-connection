@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../../AbstractCommand");
+const __1 = require("../../..");
 class TransitionWipeCommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
@@ -10,16 +11,16 @@ class TransitionWipeCommand extends AbstractCommand_1.default {
         this._updateProps(newProps);
     }
     deserialize(rawCommand) {
-        this.mixEffect = rawCommand[0];
+        this.mixEffect = __1.Util.parseNumberBetween(rawCommand[0], 0, 3);
         this.properties = {
-            rate: rawCommand[1],
-            pattern: rawCommand[2],
-            borderWidth: rawCommand[4] << 8 | rawCommand[5],
-            borderInput: rawCommand[6] << 8 | rawCommand[7],
-            symmetry: rawCommand[8] << 8 | rawCommand[9],
-            borderSoftness: rawCommand[10] << 8 | rawCommand[11],
-            xPosition: rawCommand[12] << 8 | rawCommand[13],
-            yPosition: rawCommand[14] << 8 | rawCommand[15],
+            rate: __1.Util.parseNumberBetween(rawCommand[1], 1, 250),
+            pattern: __1.Util.parseEnum(rawCommand[2], __1.Enums.Pattern),
+            borderWidth: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(4), 0, 10000),
+            borderInput: rawCommand.readUInt16BE(6),
+            symmetry: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(8), 0, 10000),
+            borderSoftness: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(10), 0, 10000),
+            xPosition: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(12), 0, 10000),
+            yPosition: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(14), 0, 10000),
             reverseDirection: rawCommand[16] === 1,
             flipFlop: rawCommand[17] === 1
         };
@@ -35,7 +36,7 @@ class TransitionWipeCommand extends AbstractCommand_1.default {
         buffer.writeUInt8(this.properties.pattern, 8);
         buffer.writeUInt16BE(this.properties.borderWidth, 10);
         buffer.writeUInt16BE(this.properties.borderInput, 12);
-        buffer.writeUInt16BE(this.properties.symmetry ? 1 : 0, 14);
+        buffer.writeUInt16BE(this.properties.symmetry, 14);
         buffer.writeUInt16BE(this.properties.borderSoftness, 16);
         buffer.writeUInt16BE(this.properties.xPosition, 18);
         buffer.writeUInt16BE(this.properties.yPosition, 20);

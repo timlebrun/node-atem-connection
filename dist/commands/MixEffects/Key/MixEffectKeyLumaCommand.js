@@ -1,18 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../../AbstractCommand");
+const __1 = require("../../..");
 class MixEffectKeyLumaCommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
         this.rawName = 'KeLm';
     }
     deserialize(rawCommand) {
-        this.mixEffect = rawCommand[0];
-        this.upstreamKeyerId = rawCommand[1];
+        this.mixEffect = __1.Util.parseNumberBetween(rawCommand[0], 0, 3);
+        this.upstreamKeyerId = __1.Util.parseNumberBetween(rawCommand[1], 0, 3);
         this.properties = {
             preMultiplied: rawCommand[2] === 1,
-            clip: rawCommand.readUInt16BE(4),
-            gain: rawCommand.readUInt16BE(6),
+            clip: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(4), 0, 1000),
+            gain: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(6), 0, 1000),
             invert: rawCommand[8] === 1
         };
     }

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../AbstractCommand");
+const __1 = require("../..");
 class SuperSourceBoxParametersCommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
@@ -14,14 +15,14 @@ class SuperSourceBoxParametersCommand extends AbstractCommand_1.default {
         this.properties = {
             enabled: rawCommand[1] === 1,
             source: rawCommand.readUInt16BE(2),
-            x: rawCommand.readInt16BE(4),
-            y: rawCommand.readInt16BE(6),
-            size: rawCommand.readUInt16BE(8),
+            x: __1.Util.parseNumberBetween(rawCommand.readInt16BE(4), -4800, 4800),
+            y: __1.Util.parseNumberBetween(rawCommand.readInt16BE(6), -3400, 3400),
+            size: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(8), 70, 1000),
             cropped: rawCommand[10] === 1,
-            cropTop: rawCommand.readUInt16BE(12),
-            cropBottom: rawCommand.readUInt16BE(14),
-            cropLeft: rawCommand.readUInt16BE(16),
-            cropRight: rawCommand.readUInt16BE(18)
+            cropTop: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(12), 0, 18000),
+            cropBottom: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(14), 0, 18000),
+            cropLeft: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(16), 0, 32000),
+            cropRight: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(18), 0, 3200)
         };
     }
     serialize() {

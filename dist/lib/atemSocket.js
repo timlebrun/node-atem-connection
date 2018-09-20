@@ -1,151 +1,140 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const dgram_1 = require("dgram");
+const tslib_1 = require("tslib");
+const child_process_1 = require("child_process");
 const events_1 = require("events");
-const atemUtil_1 = require("./atemUtil");
+const path = require("path");
 const atemCommandParser_1 = require("./atemCommandParser");
 const enums_1 = require("../enums");
+const exitHook = require("exit-hook");
+const atemUtil_1 = require("./atemUtil");
 class AtemSocket extends events_1.EventEmitter {
     constructor(options) {
         super();
-        this._connectionState = enums_1.ConnectionState.Closed;
         this._debug = false;
-        this._localPacketId = 1;
-        this._maxPacketID = (1 << 15) - 1; // Atem expects 15 not 16 bits before wrapping
+        this._localPacketId = 0;
         this._port = 9910;
-        this._reconnectInterval = 5000;
-        this._inFlightTimeout = 200;
-        this._maxRetries = 5;
-        this._lastReceivedAt = Date.now();
-        this._inFlight = [];
+        this._shouldConnect = false;
         this._commandParser = new atemCommandParser_1.CommandParser();
         this._address = options.address || this._address;
         this._port = options.port || this._port;
         this._debug = options.debug || false;
         this.log = options.log || this.log;
-        this._createSocket();
+        this._createSocketProcess();
+        // When the parent process begins exiting, remove the listeners on our child process.
+        // We do this to avoid throwing an error when the child process exits
+        // as a natural part of the parent process exiting.
+        exitHook(() => {
+            if (this._socketProcess) {
+                this._socketProcess.removeAllListeners();
+            }
+        });
     }
     connect(address, port) {
-        if (!this._reconnectTimer) {
-            this._reconnectTimer = setInterval(() => {
-                if (this._lastReceivedAt + this._reconnectInterval > Date.now())
-                    return;
-                if (this._connectionState === enums_1.ConnectionState.Established) {
-                    this._connectionState = enums_1.ConnectionState.Closed;
-                    this.emit('disconnect', null, null);
-                }
-                this._localPacketId = 1;
-                this._sessionId = 0;
-                this.log('reconnect');
-                if (this._address && this._port) {
-                    this._sendPacket(atemUtil_1.Util.COMMAND_CONNECT_HELLO);
-                    this._connectionState = enums_1.ConnectionState.SynSent;
-                }
-            }, this._reconnectInterval);
-        }
-        if (!this._retransmitTimer) {
-            this._retransmitTimer = setInterval(() => this._checkForRetransmit(), 50);
-        }
+        this._shouldConnect = true;
         if (address) {
             this._address = address;
         }
         if (port) {
             this._port = port;
         }
-        this._sendPacket(atemUtil_1.Util.COMMAND_CONNECT_HELLO);
-        this._connectionState = enums_1.ConnectionState.SynSent;
+        return this._sendSubprocessMessage({
+            cmd: enums_1.IPCMessageType.Connect,
+            payload: {
+                address: this._address,
+                port: this._port
+            }
+        });
     }
     disconnect() {
-        return new Promise((resolve) => {
-            if (this._connectionState === enums_1.ConnectionState.Established) {
-                this._socket.close(() => {
-                    clearInterval(this._retransmitTimer);
-                    clearInterval(this._reconnectTimer);
-                    this._retransmitTimer = undefined;
-                    this._reconnectTimer = undefined;
-                    this._connectionState = enums_1.ConnectionState.Closed;
-                    this._createSocket();
-                    this.emit('disconnect');
-                    resolve();
-                });
-            }
-            else {
-                resolve();
-            }
+        this._shouldConnect = false;
+        return this._sendSubprocessMessage({
+            cmd: enums_1.IPCMessageType.Disconnect
         });
     }
     log(..._args) {
         // Will be re-assigned by the top-level ATEM class.
     }
     get nextPacketId() {
-        return this._localPacketId;
+        if (this._localPacketId >= Number.MAX_SAFE_INTEGER) {
+            this._localPacketId = 0;
+        }
+        return ++this._localPacketId;
     }
-    _sendCommand(command) {
+    _sendCommand(command, trackingId) {
         if (typeof command.serialize !== 'function') {
-            return;
+            return Promise.reject(new Error('Command is not serializable'));
         }
         const payload = command.serialize();
         if (this._debug)
             this.log('PAYLOAD', payload);
-        const buffer = new Buffer(16 + payload.length);
-        buffer.fill(0);
-        buffer[0] = (16 + payload.length) / 256 | 0x08;
-        buffer[1] = (16 + payload.length) % 256;
-        buffer[2] = this._sessionId >> 8;
-        buffer[3] = this._sessionId & 0xff;
-        buffer[10] = this._localPacketId / 256;
-        buffer[11] = this._localPacketId % 256;
-        buffer[12] = (4 + payload.length) / 256;
-        buffer[13] = (4 + payload.length) % 256;
-        payload.copy(buffer, 16);
-        this._sendPacket(buffer);
-        this._inFlight.push({ packetId: this._localPacketId, lastSent: Date.now(), packet: buffer, resent: 0 });
-        this._localPacketId++;
-        if (this._maxPacketID < this._localPacketId)
-            this._localPacketId = 0;
-    }
-    _createSocket() {
-        this._socket = dgram_1.createSocket('udp4');
-        this._socket.bind(1024 + Math.floor(Math.random() * 64511));
-        this._socket.on('message', (packet, rinfo) => this._receivePacket(packet, rinfo));
-    }
-    _receivePacket(packet, rinfo) {
-        if (this._debug)
-            this.log('RECV ', packet);
-        this._lastReceivedAt = Date.now();
-        const length = ((packet[0] & 0x07) << 8) | packet[1];
-        if (length !== rinfo.size)
-            return;
-        const flags = packet[0] >> 3;
-        // this._sessionId = [packet[2], packet[3]]
-        this._sessionId = packet[2] << 8 | packet[3];
-        const remotePacketId = packet[10] << 8 | packet[11];
-        // Send hello answer packet when receive connect flags
-        if (flags & enums_1.PacketFlag.Connect && !(flags & enums_1.PacketFlag.Repeat)) {
-            this._sendPacket(atemUtil_1.Util.COMMAND_CONNECT_HELLO_ANSWER);
-        }
-        // Parse commands, Emit 'stateChanged' event after parse
-        if (flags & enums_1.PacketFlag.AckRequest && length > 12) {
-            this._parseCommand(packet.slice(12), remotePacketId);
-        }
-        // Send ping packet, Emit 'connect' event after receive all stats
-        if (flags & enums_1.PacketFlag.AckRequest && length === 12 && this._connectionState === enums_1.ConnectionState.SynSent) {
-            this._connectionState = enums_1.ConnectionState.Established;
-        }
-        // Send ack packet (called by answer packet in Skaarhoj)
-        if (flags & enums_1.PacketFlag.AckRequest && this._connectionState === enums_1.ConnectionState.Established) {
-            this._sendAck(remotePacketId);
-            this.emit('ping');
-        }
-        // Device ack'ed our command
-        if (flags & enums_1.PacketFlag.AckReply && this._connectionState === enums_1.ConnectionState.Established) {
-            const ackPacketId = packet[4] << 8 | packet[5];
-            for (const i in this._inFlight) {
-                if (ackPacketId >= this._inFlight[i].packetId) {
-                    this.emit('commandAcknowleged', this._inFlight[i].packetId);
-                    delete this._inFlight[i];
-                }
+        return this._sendSubprocessMessage({
+            cmd: enums_1.IPCMessageType.OutboundCommand,
+            payload: {
+                data: payload,
+                trackingId
             }
+        });
+    }
+    _createSocketProcess() {
+        if (this._socketProcess) {
+            this._socketProcess.removeAllListeners();
+            this._socketProcess.kill();
+            this._socketProcess = null;
+        }
+        this._socketProcess = child_process_1.fork(path.resolve(__dirname, '../socket-child.js'), [], {
+            silent: !this._debug,
+            stdio: this._debug ? [0, 1, 2, 'ipc'] : undefined
+        });
+        this._socketProcess.on('message', this._receiveSubprocessMessage.bind(this));
+        this._socketProcess.on('error', error => {
+            this.emit('error', error);
+            this.log('socket process error:', error);
+        });
+        this._socketProcess.on('exit', (code, signal) => {
+            process.nextTick(() => {
+                this.emit('error', new Error(`The socket process unexpectedly closed (code: "${code}", signal: "${signal}")`));
+                this.log('socket process exit:', code, signal);
+                this._createSocketProcess();
+            });
+        });
+        if (this._shouldConnect) {
+            this.connect().catch(error => {
+                const errorMsg = 'Failed to reconnect after respawning socket process';
+                this.emit('error', error);
+                this.log(errorMsg + ':', error && error.message);
+            });
+        }
+    }
+    _sendSubprocessMessage(message) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            if (!this._socketProcess) {
+                throw new Error('Socket process process does not exist');
+            }
+            return atemUtil_1.Util.sendIPCMessage(this, '_socketProcess', message, this.log);
+        });
+    }
+    _receiveSubprocessMessage(message) {
+        if (typeof message !== 'object') {
+            return;
+        }
+        if (typeof message.cmd !== 'string' || message.cmd.length <= 0) {
+            return;
+        }
+        const payload = message.payload;
+        switch (message.cmd) {
+            case enums_1.IPCMessageType.Log:
+                this.log(message.payload);
+                break;
+            case enums_1.IPCMessageType.CommandAcknowledged:
+                this.emit(enums_1.IPCMessageType.CommandAcknowledged, message.payload);
+                break;
+            case enums_1.IPCMessageType.InboundCommand:
+                this._parseCommand(Buffer.from(payload.packet.data), payload.remotePacketId);
+                break;
+            case enums_1.IPCMessageType.Disconnect:
+                this.emit(enums_1.IPCMessageType.Disconnect);
+                break;
         }
     }
     _parseCommand(buffer, packetId) {
@@ -157,46 +146,17 @@ class AtemSocket extends events_1.EventEmitter {
         // this.log('COMMAND', `${name}(${length})`, buffer.slice(0, length))
         const cmd = this._commandParser.commandFromRawName(name);
         if (cmd && typeof cmd.deserialize === 'function') {
-            cmd.deserialize(buffer.slice(0, length).slice(8));
-            cmd.packetId = packetId || -1;
-            this.emit('receivedStateChange', cmd);
+            try {
+                cmd.deserialize(buffer.slice(0, length).slice(8));
+                cmd.packetId = packetId || -1;
+                this.emit('receivedStateChange', cmd);
+            }
+            catch (e) {
+                this.emit('error', e);
+            }
         }
         if (buffer.length > length) {
             this._parseCommand(buffer.slice(length), packetId);
-        }
-    }
-    _sendPacket(packet) {
-        if (this._debug)
-            this.log('SEND ', packet);
-        this._socket.send(packet, 0, packet.length, this._port, this._address);
-    }
-    _sendAck(packetId) {
-        const buffer = new Buffer(12);
-        buffer.fill(0);
-        buffer[0] = 0x80;
-        buffer[1] = 0x0C;
-        buffer[2] = this._sessionId >> 8;
-        buffer[3] = this._sessionId & 0xFF;
-        buffer[4] = packetId >> 8;
-        buffer[5] = packetId & 0xFF;
-        buffer[9] = 0x41;
-        this._sendPacket(buffer);
-    }
-    _checkForRetransmit() {
-        for (const sentPacket of this._inFlight) {
-            if (sentPacket && sentPacket.lastSent + this._inFlightTimeout < Date.now()) {
-                if (sentPacket.resent <= this._maxRetries) {
-                    sentPacket.lastSent = Date.now();
-                    sentPacket.resent++;
-                    this.log('RESEND: ', sentPacket);
-                    this._sendPacket(sentPacket.packet);
-                }
-                else {
-                    this._inFlight.splice(this._inFlight.indexOf(sentPacket), 1);
-                    this.log('TIMED OUT: ', sentPacket.packet);
-                    // @todo: we should probably break up the connection here.
-                }
-            }
         }
     }
 }

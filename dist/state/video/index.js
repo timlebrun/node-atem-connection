@@ -24,10 +24,10 @@ class MixEffect {
 exports.MixEffect = MixEffect;
 class AtemVideoState {
     constructor() {
-        this.ME = [];
-        this.downstreamKeyers = [];
-        this.auxilliaries = [];
-        this.superSourceBoxes = [];
+        this.ME = {};
+        this.downstreamKeyers = {};
+        this.auxilliaries = {};
+        this.superSourceBoxes = {};
     }
     getMe(index) {
         if (!this.ME[index]) {

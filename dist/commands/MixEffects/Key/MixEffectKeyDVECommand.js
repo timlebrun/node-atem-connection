@@ -1,41 +1,42 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AbstractCommand_1 = require("../../AbstractCommand");
+const __1 = require("../../..");
 class MixEffectKeyDVECommand extends AbstractCommand_1.default {
     constructor() {
         super(...arguments);
         this.rawName = 'KeDV';
     }
     deserialize(rawCommand) {
-        this.mixEffect = rawCommand[0];
-        this.upstreamKeyerId = rawCommand[1];
+        this.mixEffect = __1.Util.parseNumberBetween(rawCommand[0], 0, 3);
+        this.upstreamKeyerId = __1.Util.parseNumberBetween(rawCommand[1], 0, 3);
         this.properties = {
-            sizeX: rawCommand.readUInt32BE(4),
-            sizeY: rawCommand.readUInt32BE(8),
-            positionX: rawCommand.readInt32BE(12),
-            positionY: rawCommand.readInt32BE(16),
-            rotation: rawCommand.readInt32BE(20),
+            sizeX: __1.Util.parseNumberBetween(rawCommand.readUInt32BE(4), 0, 99990),
+            sizeY: __1.Util.parseNumberBetween(rawCommand.readUInt32BE(8), 0, 99990),
+            positionX: __1.Util.parseNumberBetween(rawCommand.readInt32BE(12), -1000 * 1000, 1000 * 1000),
+            positionY: __1.Util.parseNumberBetween(rawCommand.readInt32BE(16), -1000 * 1000, 1000 * 1000),
+            rotation: __1.Util.parseNumberBetween(rawCommand.readInt32BE(20), -332230, 332230),
             borderEnabled: rawCommand[24] === 1,
             shadowEnabled: rawCommand[25] === 1,
-            borderBevel: rawCommand.readUInt8(26),
-            borderOuterWidth: rawCommand.readUInt16BE(28),
-            borderInnerWidth: rawCommand.readUInt16BE(30),
-            borderOuterSoftness: rawCommand.readInt8(32),
-            borderInnerSoftness: rawCommand.readInt8(33),
-            borderBevelSoftness: rawCommand.readInt8(34),
-            borderBevelPosition: rawCommand.readInt8(35),
-            borderOpacity: rawCommand.readInt8(36),
-            borderHue: rawCommand.readUInt16BE(38),
-            borderSaturation: rawCommand.readUInt16BE(40),
-            borderLuma: rawCommand.readUInt16BE(42),
-            lightSourceDirection: rawCommand.readUInt16BE(44),
-            lightSourceAltitude: rawCommand.readUInt8(46),
+            borderBevel: __1.Util.parseEnum(rawCommand.readUInt8(26), __1.Enums.BorderBevel),
+            borderOuterWidth: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(28), 0, 1600),
+            borderInnerWidth: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(30), 0, 1600),
+            borderOuterSoftness: __1.Util.parseNumberBetween(rawCommand.readInt8(32), 0, 100),
+            borderInnerSoftness: __1.Util.parseNumberBetween(rawCommand.readInt8(33), 0, 100),
+            borderBevelSoftness: __1.Util.parseNumberBetween(rawCommand.readInt8(34), 0, 100),
+            borderBevelPosition: __1.Util.parseNumberBetween(rawCommand.readInt8(35), 0, 100),
+            borderOpacity: __1.Util.parseNumberBetween(rawCommand.readInt8(36), 0, 100),
+            borderHue: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(38), 0, 1000),
+            borderSaturation: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(40), 0, 1000),
+            borderLuma: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(42), 0, 1000),
+            lightSourceDirection: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(44), 0, 3599),
+            lightSourceAltitude: __1.Util.parseNumberBetween(rawCommand.readUInt8(46), 0, 100),
             maskEnabled: rawCommand[47] === 1,
-            maskTop: rawCommand.readUInt16BE(48),
-            maskBottom: rawCommand.readUInt16BE(50),
-            maskLeft: rawCommand.readUInt16BE(52),
-            maskRight: rawCommand.readUInt16BE(54),
-            rate: rawCommand.readInt8(56)
+            maskTop: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(48), 0, 38000),
+            maskBottom: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(50), 0, 38000),
+            maskLeft: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(52), 0, 52000),
+            maskRight: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(54), 0, 52000),
+            rate: __1.Util.parseNumberBetween(rawCommand.readInt8(56), 0, 250)
         };
     }
     serialize() {
