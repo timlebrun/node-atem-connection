@@ -57,7 +57,6 @@ class DataLock {
         this.state = locked ? 1 : 0;
     }
     transferFinished() {
-        this.transfer = undefined;
         if (this.queue.length > 0) {
             this.dequeueAndRun();
         }
