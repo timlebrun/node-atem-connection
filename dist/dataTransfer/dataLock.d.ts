@@ -14,4 +14,6 @@ export default class DataLock {
     updateLock(locked: boolean): void;
     transferFinished(): void;
     transferErrored(code: number): void;
+    _getLock(): void;
+    _releaseLock(): void;
 }
