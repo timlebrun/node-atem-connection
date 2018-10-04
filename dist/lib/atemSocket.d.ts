@@ -20,8 +20,8 @@ export declare class AtemSocket extends EventEmitter {
     log(..._args: any[]): void;
     readonly nextPacketId: number;
     _sendCommand(command: AbstractCommand, trackingId: number): Promise<{}>;
-    private _createSocketProcess;
-    private _sendSubprocessMessage;
-    private _receiveSubprocessMessage;
-    private _parseCommand;
+    private _createSocketProcess();
+    private _sendSubprocessMessage(message);
+    private _receiveSubprocessMessage(message);
+    private _parseCommand(buffer, packetId?);
 }

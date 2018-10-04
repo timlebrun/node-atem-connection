@@ -26,7 +26,7 @@ class MixEffectKeyDVECommand extends AbstractCommand_1.default {
             borderBevelSoftness: __1.Util.parseNumberBetween(rawCommand.readInt8(34), 0, 100),
             borderBevelPosition: __1.Util.parseNumberBetween(rawCommand.readInt8(35), 0, 100),
             borderOpacity: __1.Util.parseNumberBetween(rawCommand.readInt8(36), 0, 100),
-            borderHue: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(38), 0, 1000),
+            borderHue: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(38), 0, 3600),
             borderSaturation: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(40), 0, 1000),
             borderLuma: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(42), 0, 1000),
             lightSourceDirection: __1.Util.parseNumberBetween(rawCommand.readUInt16BE(44), 0, 3599),

@@ -25,9 +25,9 @@ export declare class AtemSocketChild extends EventEmitter {
     log(...args: any[]): void;
     readonly nextPacketId: number;
     _sendCommand(serializedCommand: Buffer, trackingId: number): void;
-    private _createSocket;
-    private _receivePacket;
-    private _sendPacket;
-    private _sendAck;
-    private _checkForRetransmit;
+    private _createSocket();
+    private _receivePacket(packet, rinfo);
+    private _sendPacket(packet);
+    private _sendAck(packetId);
+    private _checkForRetransmit();
 }

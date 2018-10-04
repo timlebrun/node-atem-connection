@@ -6,32 +6,32 @@ export declare enum Model {
     OneME4K = 5,
     TwoME4K = 6,
     TwoMEBS4K = 7,
-    TVSHD = 8
+    TVSHD = 8,
 }
 export declare enum TransitionStyle {
     MIX = 0,
     DIP = 1,
     WIPE = 2,
     DVE = 3,
-    STING = 4
+    STING = 4,
 }
 export declare enum TallyState {
     None = 0,
     Program = 1,
-    Preview = 2
+    Preview = 2,
 }
 export declare enum ConnectionState {
     None = 0,
     SynSent = 1,
     Established = 2,
-    Closed = 3
+    Closed = 3,
 }
 export declare enum PacketFlag {
     AckRequest = 1,
     Connect = 2,
     Repeat = 4,
     Error = 8,
-    AckReply = 16
+    AckReply = 16,
 }
 export declare enum DVEEffect {
     SwooshTopLeft = 0,
@@ -68,7 +68,7 @@ export declare enum DVEEffect {
     PushBottomRight = 31,
     GraphicCWSpin = 32,
     GraphicCCWSpin = 33,
-    GraphicLogoWipe = 34
+    GraphicLogoWipe = 34,
 }
 export declare enum MacroAction {
     Run = 0,
@@ -76,7 +76,7 @@ export declare enum MacroAction {
     StopRecord = 2,
     InsertUserWait = 3,
     Continue = 4,
-    Delete = 5
+    Delete = 5,
 }
 export declare enum ExternalPorts {
     None = 0,
@@ -85,7 +85,7 @@ export declare enum ExternalPorts {
     Component = 4,
     Composite = 8,
     SVideo = 16,
-    All = 31
+    All = 31,
 }
 export declare enum ExternalPortType {
     Internal = 0,
@@ -93,7 +93,7 @@ export declare enum ExternalPortType {
     HDMI = 2,
     Composite = 3,
     Component = 4,
-    SVideo = 5
+    SVideo = 5,
 }
 export declare enum InternalPortType {
     External = 0,
@@ -105,7 +105,7 @@ export declare enum InternalPortType {
     SuperSource = 6,
     MEOutput = 128,
     Auxiliary = 129,
-    Mask = 130
+    Mask = 130,
 }
 export declare enum SourceAvailability {
     None = 0,
@@ -114,25 +114,25 @@ export declare enum SourceAvailability {
     SuperSourceArt = 4,
     SuperSourceBox = 8,
     KeySource = 16,
-    All = 31
+    All = 31,
 }
 export declare enum MeAvailability {
     None = 0,
     Me1 = 1,
     Me2 = 2,
-    All = 3
+    All = 3,
 }
 export declare enum BorderBevel {
     None = 0,
     InOut = 1,
     In = 2,
-    Out = 3
+    Out = 3,
 }
 export declare enum IsAtKeyFrame {
     None = 0,
     A = 1,
     B = 2,
-    RunToInfinite = 4
+    RunToInfinite = 4,
 }
 export declare enum Pattern {
     LeftToRightBar = 0,
@@ -152,17 +152,17 @@ export declare enum Pattern {
     BottomCentreBox = 14,
     LeftCentreBox = 15,
     TopLeftDiagonal = 16,
-    TopRightDiagonal = 17
+    TopRightDiagonal = 17,
 }
 export declare enum MixEffectKeyType {
     Luma = 0,
     Chroma = 1,
     Pattern = 2,
-    DVE = 3
+    DVE = 3,
 }
 export declare enum SuperSourceArtOption {
     Background = 0,
-    Foreground = 1
+    Foreground = 1,
 }
 export declare enum IPCMessageType {
     Log = "log",
@@ -170,20 +170,20 @@ export declare enum IPCMessageType {
     Disconnect = "disconnect",
     InboundCommand = "inboundCommand",
     OutboundCommand = "outboundCommand",
-    CommandAcknowledged = "commandAcknowledged"
+    CommandAcknowledged = "commandAcknowledged",
 }
 export declare enum TransferMode {
     NoOp = 0,
     Write = 1,
     Clear = 2,
-    WriteAudio = 256
+    WriteAudio = 256,
 }
 export declare enum StoragePool {
     Stills = 0,
     Clip1 = 1,
     Clip2 = 2,
     Audio1 = 3,
-    Audio2 = 4
+    Audio2 = 4,
 }
 export declare enum VideoMode {
     N525i5994NTSC = 0,
@@ -205,15 +205,15 @@ export declare enum VideoMode {
     P4KHDp25 = 16,
     N4KHDp2997 = 17,
     P4KHDp5000 = 18,
-    N4KHDp5994 = 19
+    N4KHDp5994 = 19,
 }
 export declare enum TransferState {
     Queued = 0,
     Locked = 1,
     Transferring = 2,
-    Finished = 3
+    Finished = 3,
 }
 export declare enum MediaSourceType {
     Still = 1,
-    Clip = 2
+    Clip = 2,
 }

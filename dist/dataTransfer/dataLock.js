@@ -54,14 +54,14 @@ class DataLock {
         if (this.queue.length > 0) {
             this.dequeueAndRun();
         }
-        else { // unlock
+        else {
             this._releaseLock();
         }
     }
     transferErrored(code) {
         if (this.transfer) {
             switch (code) {
-                case 1: // Probably means "retry".
+                case 1:// Probably means "retry".
                     if (this.transfer instanceof dataTransferClip_1.default) {
                         // Retry the last frame.
                         this.transfer.frames[this.transfer.curFrame].start();
