@@ -1,4 +1,5 @@
 export * from './Audio'
+export * from './Camera'
 export * from './DataTransfer'
 export * from './DeviceProfile'
 export * from './DownstreamKey'

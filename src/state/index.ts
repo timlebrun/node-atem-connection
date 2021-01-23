@@ -9,6 +9,7 @@ import { RecordingState } from './recording'
 import { StreamingState } from './streaming'
 import { AtemFairlightAudioState } from './fairlight'
 import * as AtemStateUtil from './util'
+import { CameraState } from './camera'
 export { AtemStateUtil }
 
 export interface AtemState {
@@ -18,6 +19,7 @@ export interface AtemState {
 	fairlight?: AtemFairlightAudioState
 	media: MediaState
 	inputs: { [inputId: number]: InputChannel | undefined }
+	cameras?: { [inputId: number]: CameraState | undefined }
 	macro: MacroState
 	settings: SettingsState
 	recording?: RecordingState
